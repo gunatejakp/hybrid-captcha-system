@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hybrid CAPTCHA with Phishing Protection</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    #captcha-image { border: 1px solid #000; margin-bottom: 10px; }
+    #site-badge { border: 1px solid #ddd; padding: 6px; border-radius: 6px; display: inline-block; background-color: #f8f8f8; margin-bottom: 20px; }
+    #site-badge img { height: 18px; vertical-align: middle; margin-right: 6px; }
+    form { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Login</h2>
+
+  <!-- Secure site badge -->
+  <div id="site-badge">
+    <img src="padlock.svg" alt="Padlock icon" width="20" height="20">
+    <strong>secure.example</strong>
+    <span>Signed in as: <em id="partialUser">a***@gmail.com</em></span>
+  </div>
+
+  <form id="login-form">
+    <!-- Step 1: Text CAPTCHA -->
+    <p>Step 1: Verify with Text CAPTCHA</p>
+    <div id="text-captcha" style="font-weight:bold; font-size:20px;"></div>
+    <input type="text" id="text-input" placeholder="Enter CAPTCHA">
+    <button type="button" onclick="verifyText()">Verify</button>
+    <br><br>
+
+    <!-- Step 2: Math CAPTCHA -->
+    <p>Step 2: Math CAPTCHA</p>
+    <canvas id="captcha-image" width="300" height="100"></canvas><br>
+    <input type="text" id="math-input" placeholder="Enter solution">
+    <button type="button" onclick="verifyMath()">Verify</button>
+    <br><br>
+
+    <!-- Step 3: Audio CAPTCHA -->
+    <p>Step 3: Audio CAPTCHA</p>
+    <audio controls id="audio-captcha">
+      <source src="https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav" type="audio/wav">
+      Your browser does not support the audio element.
+    </audio><br>
+    <input type="text" id="audio-input" placeholder="Enter what you hear">
+    <button type="button" onclick="verifyAudio()">Verify</button>
+  </form>
+
+  <script>
+    let expectedText = "", expectedMath = 0;
+
+    // Generate random text CAPTCHA
+    function generateTextCaptcha() {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      expectedText = Array.from({length: 5}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      document.getElementById("text-captcha").innerText = expectedText;
+    }
+
+    // Verify text CAPTCHA
+    function verifyText() {
+      const input = document.getElementById("text-input").value.trim();
+      alert(input === expectedText ? "✅ Text CAPTCHA Verified" : "❌ Incorrect CAPTCHA");
+      generateTextCaptcha();
+    }
+
+    // Generate math CAPTCHA
+    function generateMathCaptcha() {
+      const num1 = Math.floor(Math.random() * 10);
+      const num2 = Math.floor(Math.random() * 10);
+      expectedMath = num1 + num2;
+
+      const canvas = document.getElementById('captcha-image');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = '30px Arial';
+      ctx.fillText(`${num1} + ${num2} = ?`, 80, 60);
+    }
+
+    // Verify math CAPTCHA
+    function verifyMath() {
+      const input = parseInt(document.getElementById("math-input").value);
+      alert(input === expectedMath ? "✅ Math CAPTCHA Verified" : "❌ Incorrect Answer");
+      generateMathCaptcha();
+    }
+
+    // Verify audio CAPTCHA
+    function verifyAudio() {
+      const input = document.getElementById("audio-input").value.trim();
+      alert(input ? "✅ Audio CAPTCHA Verified" : "❌ Please enter the audio response");
+    }
+
+    // Initialize CAPTCHA and anti-phishing warning
+    window.onload = () => {
+      generateTextCaptcha();
+      generateMathCaptcha();
+
+      const EXPECTED_HOST = "localhost:3000";
+      if (window.location.host !== EXPECTED_HOST) {
+        const warn = document.createElement("div");
+        warn.style.background = "#ffcccc";
+        warn.style.padding = "10px";
+        warn.style.marginBottom = "15px";
+        warn.style.border = "1px solid red";
+        warn.innerText = "⚠️ Warning: This is not the official domain!";
+        document.body.prepend(warn);
+      }
+    };
+  </script>
+</body>
+</html>
