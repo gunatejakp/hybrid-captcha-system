@@ -1,6 +1,7 @@
 # Hybrid CAPTCHA System with Anti-Phishing Protection
 
 A secure authentication system that combines multiple CAPTCHA techniques to prevent automated attacks and phishing.
+Developed a secure authentication system that combines text, image, and audio CAPTCHA mechanisms to prevent automated bot attacks. The system integrates anti-phishing protections, including domain watermarking, origin validation, CAPTCHA token expiry, and rate-limiting to enhance web security. Built using HTML, JavaScript, Node.js, and Express, the system ensures both strong security and user accessibility.
 
 ## Features
 
